@@ -4,7 +4,8 @@
 const esc = (s) => s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
 const OVERSHOOT = 6; // wrong characters allowed past the end of a word
 
-export function createTyping({ text, textEl, inputEl, onProgress, onFinish, onError, onWord }) {
+export function createTyping({ text, textEl, inputEl, onProgress, onFinish, onError, onWord, onKey }) {
+  let popLast = false; // mark the letter that was just typed so it can be animated
   const words = text.split(' ');
   let wi = 0;        // index of the word being typed
   let done = 0;      // characters locked in by completed words
@@ -34,7 +35,9 @@ export function createTyping({ text, textEl, inputEl, onProgress, onFinish, onEr
     const wordEnd = Math.max(c, wi < words.length ? done + words[wi].length : text.length);
     textEl.innerHTML =
       '<span class="t-done">' + esc(text.slice(0, a)) + '</span>' +
-      '<span class="t-ok">' + esc(text.slice(a, b)) + '</span>' +
+      '<span class="t-ok">' + (popLast && b > a
+        ? esc(text.slice(a, b - 1)) + '<span class="t-pop">' + esc(text[b - 1]) + '</span>'
+        : esc(text.slice(a, b))) + '</span>' +
       '<span class="t-bad">' + esc(text.slice(b, c)) + '</span>' +
       '<span class="t-caret"></span>' +
       '<span class="t-cur">' + esc(text.slice(c, wordEnd)) + '</span>' +
@@ -65,14 +68,18 @@ export function createTyping({ text, textEl, inputEl, onProgress, onFinish, onEr
     }
     const t = target();
     if (v.length > t.length + OVERSHOOT) v = v.slice(0, t.length + OVERSHOOT);
-    if (added && prefixLen(v, t) < v.length) {
+    const wrong = prefixLen(v, t) < v.length;
+    if (added && wrong) {
       errors += Math.min(added, v.length - prefixLen(v, t));
       if (onError) onError();
     }
+    popLast = added > 0 && !wrong;
     if (v !== inputEl.value) inputEl.value = v;
     prev = v;
     if (advanced && !finished && onWord) onWord();
     render();
+    if (added && onKey) onKey({ correct: !wrong, wordDone: advanced });
+    popLast = false;
     if (onProgress) onProgress(stats());
     if (finished && onFinish) onFinish(stats());
   }

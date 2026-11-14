@@ -27,6 +27,19 @@ test('join rules: unique names, lobby only, max players', () => {
   assert.equal(looks.size, 10);
 });
 
+test('racers can pick one of 15 animals; a taken one is refused', () => {
+  const { g } = setup(0);
+  assert.equal(g.avatarOptions().length, 15);
+  const a = g.addPlayer('Ali', 12);
+  assert.ok(a.ok);
+  assert.equal(a.player.avatar, g.avatarOptions()[12].emoji);
+  assert.equal(g.avatarOptions()[12].taken, true);
+  assert.match(g.addPlayer('Bo', 12).error, /taken/);
+  assert.ok(g.addPlayer('Bo', 99).error);
+  assert.ok(g.addPlayer('Bo', 'x').error);
+  assert.equal(g.addPlayer('Bo').player.look, 0); // no choice: first free animal
+});
+
 test('start needs everyone ready unless forced', () => {
   const { g, ps } = setup(2);
   assert.ok(g.startRound().error);

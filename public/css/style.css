@@ -324,3 +324,52 @@ main { flex: 1; display: flex; flex-direction: column; padding: 0 clamp(16px, 3v
 
 /* primary action with a quieter secondary beside it */
 .actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 24px; }
+
+/* ---------- racer picker ---------- */
+.picker-label { display: block; margin-bottom: 10px; font-weight: 700; font-size: .85rem; letter-spacing: .1em; text-transform: uppercase; color: var(--soft); }
+.picker-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.pick {
+  aspect-ratio: 1; display: grid; place-items: center; padding: 0; cursor: pointer;
+  border: 0; border-radius: 14px; background: var(--c);
+  box-shadow: 0 5px 0 rgba(0, 0, 0, .38);
+  font-size: clamp(1.5rem, 6.5vw, 2.1rem); line-height: 1;
+  transition: transform .12s ease, box-shadow .12s ease, opacity .12s ease;
+}
+.pick span { display: block; }
+.pick:hover:not(:disabled) span, .pick:focus-visible span { animation: wiggle .5s ease-in-out infinite; }
+.pick.is-picked {
+  transform: translateY(-4px) scale(1.08);
+  box-shadow: 0 9px 0 rgba(0, 0, 0, .38), 0 0 0 4px var(--cap);
+  z-index: 1;
+}
+.pick.is-picked span { animation: hop .62s cubic-bezier(.3, 0, .3, 1) infinite; }
+.pick:disabled { opacity: .28; cursor: not-allowed; box-shadow: none; filter: grayscale(1); }
+@keyframes wiggle { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
+@keyframes hop {
+  0%, 100% { transform: translateY(0) scale(1.08, .9); }
+  45% { transform: translateY(-26%) scale(.95, 1.08) rotate(-6deg); }
+  70% { transform: translateY(-8%) scale(1, 1) rotate(4deg); }
+}
+.me-cap { animation: hop 1s cubic-bezier(.3, 0, .3, 1) infinite; }
+
+/* ---------- running racers ---------- */
+.racer::before, .racer::after { /* dust kicked up behind a running racer */
+  content: ''; position: absolute; right: 100%; bottom: 8%; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--cap); opacity: 0; pointer-events: none;
+}
+.lane.is-running .racer::before { animation: dust .5s ease-out infinite; }
+.lane.is-running .racer::after { animation: dust .5s ease-out .25s infinite; }
+@keyframes dust {
+  from { transform: translate(4px, 0) scale(.9); opacity: .55; }
+  to { transform: translate(-16px, -9px) scale(.2); opacity: 0; }
+}
+.track-big .racer::before, .track-big .racer::after { width: 11px; height: 11px; }
+
+/* ---------- typing effects ---------- */
+.t-pop { display: inline-block; transform-origin: 50% 80%; }
+.fx-layer { position: fixed; inset: 0; z-index: 15; pointer-events: none; overflow: hidden; }
+.fx-layer i { position: absolute; border-radius: 50%; margin: -3px 0 0 -3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-iteration-count: 1 !important; }
+}

@@ -4,7 +4,10 @@ import { createClock } from './clock.js';
 import { createTyping } from './typing.js';
 import { createTrack } from './track.js';
 import { sfx } from './sfx.js';
+import { sparks, popLetter, shake } from './fx.js';
 
+const ANIMAL_NAMES = ['Fox', 'Panda', 'Tiger', 'Frog', 'Octopus', 'Owl', 'Koala', 'Unicorn', 'Penguin', 'Bee',
+  'Rabbit', 'Cat', 'Dog', 'Monkey', 'Pig'];
 const TOKEN_KEY = 'ks_token';
 const SEND_MS = 150;
 const FINAL_REVEAL_MS = 9000; // keep phones quiet while the host screen reveals the podium
@@ -89,6 +92,7 @@ $('#pin-form').addEventListener('submit', (e) => {
     if (!r || r.error) { $('#pin-err').textContent = (r && r.error) || 'Could not reach the game. Try again.'; return; }
     pin = v;
     $('#name-err').textContent = '';
+    setAvatars(r.avatars);
     showScreen('s-name');
   });
 });
@@ -96,13 +100,52 @@ const urlPin = new URLSearchParams(location.search).get('pin');
 if (urlPin && /^\d{6}$/.test(urlPin)) pinInput.value = urlPin;
 paintPin();
 
-// ---------- nickname ----------
+// ---------- nickname and racer ----------
+let avatars = [];
+let pick = null; // index of the chosen animal
+
+function setAvatars(list) {
+  avatars = Array.isArray(list) ? list : [];
+  const chosen = avatars.find((a) => a.i === pick);
+  if (!chosen || chosen.taken) {
+    const free = avatars.find((a) => !a.taken);
+    pick = free ? free.i : null;
+  }
+  paintPicker();
+}
+
+function paintPicker() {
+  $('#avatar-grid').innerHTML = avatars.map((a) =>
+    '<button type="button" class="pick' + (a.i === pick ? ' is-picked' : '') + '" data-i="' + a.i + '"' +
+    ' style="--c:' + a.color + '" aria-pressed="' + (a.i === pick) + '"' + (a.taken ? ' disabled' : '') +
+    ' aria-label="' + (ANIMAL_NAMES[a.i] || 'Racer') + (a.taken ? ', taken' : '') + '">' +
+    '<span>' + esc(a.emoji) + '</span></button>').join('');
+}
+
+$('#avatar-grid').addEventListener('click', (e) => {
+  const btn = e.target.closest('.pick');
+  if (!btn || btn.disabled) return;
+  pick = Number(btn.dataset.i);
+  for (const b of $('#avatar-grid').children) {
+    const on = b === btn;
+    b.classList.toggle('is-picked', on);
+    b.setAttribute('aria-pressed', String(on));
+  }
+  $('#name-err').textContent = '';
+  sfx.ready();
+});
+
 $('#name-form').addEventListener('submit', (e) => {
   e.preventDefault();
   const name = $('#name').value.trim();
   if (!name) { $('#name-err').textContent = 'Enter a nickname.'; return; }
-  socket.emit('player:join', { pin, name }, (r) => {
-    if (!r || r.error) { $('#name-err').textContent = (r && r.error) || 'Could not join. Try again.'; return; }
+  if (pick === null) { $('#name-err').textContent = 'Pick an animal for your racer.'; return; }
+  socket.emit('player:join', { pin, name, avatar: pick }, (r) => {
+    if (!r || r.error) {
+      if (r && r.avatars) setAvatars(r.avatars);
+      $('#name-err').textContent = (r && r.error) || 'Could not join. Try again.';
+      return;
+    }
     meId = r.id;
     saveToken(r.token);
     sfx.join();
@@ -162,7 +205,15 @@ function startRace(me) {
     inputEl: typeInput,
     onProgress: () => { pendingSend = true; },
     onWord: () => sfx.word(),
-    onError: () => sfx.error(),
+    onError: () => { sfx.error(); shake(typeInput); },
+    onKey: ({ correct, wordDone }) => {
+      if (!correct) return;
+      popLetter($('#copy .t-pop'));
+      const caret = $('#copy .t-caret');
+      if (!caret) return;
+      const box = caret.getBoundingClientRect();
+      sparks(box.left, box.top + box.height / 2, [me.color, '#FFD23F', '#3DDC97'], wordDone ? 7 : 2);
+    },
     onFinish: () => {
       sendProgress();
       typeInput.disabled = true;

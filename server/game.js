@@ -1,8 +1,9 @@
 'use strict';
 const crypto = require('crypto');
 
-const AVATARS = ['🦊', '🐼', '🐯', '🐸', '🐙', '🦉', '🐨', '🦄', '🐧', '🐝'];
-const COLORS = ['#FFD23F', '#FF7A7A', '#3DDC97', '#7CC6FE', '#FF9F1C', '#C9A7FF', '#F78FB3', '#9BE564', '#5EEAD4', '#FFB4A2'];
+const AVATARS = ['🦊', '🐼', '🐯', '🐸', '🐙', '🦉', '🐨', '🦄', '🐧', '🐝', '🐰', '🐱', '🐶', '🐵', '🐷'];
+const COLORS = ['#FFD23F', '#FF7A7A', '#3DDC97', '#7CC6FE', '#FF9F1C', '#C9A7FF', '#F78FB3', '#9BE564', '#5EEAD4', '#FFB4A2',
+  '#FFC6FF', '#A0C4FF', '#FDE68A', '#D4A373', '#FFADAD'];
 const MAX_CPS = 25; // 300 WPM: nobody at the event types faster than this
 const NAME_MAX = 15;
 
@@ -52,7 +53,14 @@ class Game {
     return { ok: true };
   }
 
-  addPlayer(rawName) {
+  // The animals a new racer can choose from, with the ones already in use.
+  avatarOptions() {
+    const used = new Set([...this.players.values()].map((p) => p.look));
+    return AVATARS.map((emoji, i) => ({ i, emoji, color: COLORS[i], taken: used.has(i) }));
+  }
+
+  // wantLook is the chosen animal's index; leave it out to get the first free one.
+  addPlayer(rawName, wantLook) {
     if (this.phase !== 'lobby') return { error: 'This game has already started.' };
     if (this.players.size >= this.maxPlayers) return { error: 'This game is full.' };
     const name = String(rawName || '').replace(/\s+/g, ' ').trim().slice(0, NAME_MAX);
@@ -63,7 +71,13 @@ class Game {
     }
     const used = new Set([...this.players.values()].map((p) => p.look));
     let look = 0;
-    while (used.has(look)) look++;
+    if (wantLook !== undefined && wantLook !== null) {
+      look = Number(wantLook);
+      if (!Number.isInteger(look) || look < 0 || look >= AVATARS.length) return { error: 'Pick an animal for your racer.' };
+      if (used.has(look)) return { error: 'That animal was just taken. Pick another.' };
+    } else {
+      while (used.has(look)) look++;
+    }
     const player = {
       id: crypto.randomBytes(6).toString('hex'),
       token: crypto.randomBytes(18).toString('hex'),

@@ -39,6 +39,10 @@
       <form class="card form" id="name-form" novalidate>
         <label for="name">Nickname</label>
         <input class="field" id="name" name="name" maxlength="15" autocomplete="off" spellcheck="false" aria-describedby="name-err" data-autofocus>
+        <div class="picker">
+          <span class="picker-label" id="picker-label">Pick your racer</span>
+          <div class="picker-grid" id="avatar-grid" role="group" aria-labelledby="picker-label"></div>
+        </div>
         <p class="err" id="name-err" role="alert"></p>
         <button class="key key-sun" type="submit">Join lobby</button>
         <button class="link" type="button" id="back-pin">Use a different PIN</button>

@@ -90,14 +90,14 @@ io.on('connection', (socket) => {
     if (!game) return ack({ error: 'No game is open yet. Ask the host for the PIN.' });
     if (String(msg && msg.pin) !== game.pin) return ack({ error: 'That PIN does not match a game. Check the big screen.' });
     if (game.phase !== 'lobby') return ack({ error: 'This game has already started.' });
-    ack({ ok: true });
+    ack({ ok: true, avatars: game.avatarOptions() });
   });
 
   socket.on('player:join', (msg, ack) => {
     ack = fn(ack);
     if (!game || String(msg && msg.pin) !== game.pin) return ack({ error: 'That PIN does not match a game.' });
-    const r = game.addPlayer(msg.name);
-    if (r.error) return ack(r);
+    const r = game.addPlayer(msg.name, msg.avatar);
+    if (r.error) return ack({ error: r.error, avatars: game.avatarOptions() });
     attach(socket, r.player);
     ack({ ok: true, id: r.player.id, token: r.player.token });
     broadcast();
