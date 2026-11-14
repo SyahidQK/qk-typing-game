@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Keysprint</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="player">
+  <header class="topbar">
+    <span class="brand">Key<b>sprint</b></span>
+    <span class="conn" id="conn" hidden>Reconnecting…</span>
+    <button type="button" class="ghost" id="mute"></button>
+  </header>
+
+  <main>
+    <!-- 1. PIN -->
+    <section class="screen stage" id="s-pin" hidden>
+      <h1 class="hero">Ten racers.<br>One paragraph.</h1>
+      <form class="card form" id="pin-form" novalidate>
+        <label for="pin">Game PIN</label>
+        <div class="pin-field">
+          <div class="pin-caps" id="pin-caps" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span><span></span>
+          </div>
+          <input id="pin" name="pin" inputmode="numeric" pattern="[0-9]*" maxlength="6" autocomplete="off" aria-describedby="pin-err" data-autofocus>
+        </div>
+        <p class="err" id="pin-err" role="alert"></p>
+        <button class="key key-sun" type="submit">Enter game</button>
+      </form>
+    </section>
+
+    <!-- 2. Nickname -->
+    <section class="screen stage" id="s-name" hidden>
+      <h1 class="hero">Who is racing?</h1>
+      <form class="card form" id="name-form" novalidate>
+        <label for="name">Nickname</label>
+        <input class="field" id="name" name="name" maxlength="15" autocomplete="off" spellcheck="false" aria-describedby="name-err" data-autofocus>
+        <p class="err" id="name-err" role="alert"></p>
+        <button class="key key-sun" type="submit">Join lobby</button>
+        <button class="link" type="button" id="back-pin">Use a different PIN</button>
+      </form>
+    </section>
+
+    <!-- 3. Lobby -->
+    <section class="screen stage" id="s-lobby" hidden>
+      <div class="me-cap" id="lobby-cap"></div>
+      <h1 class="hero hero-sm" id="lobby-title"></h1>
+      <p class="lede" id="lobby-status"></p>
+      <button class="key key-sun key-lg" type="button" id="ready-btn" data-autofocus></button>
+      <ul class="chips" id="lobby-players"></ul>
+    </section>
+
+    <!-- 4. Race -->
+    <section class="screen race" id="s-race" hidden>
+      <div class="hud">
+        <div class="hud-item"><span>Round</span><b id="hud-round"></b></div>
+        <div class="hud-item"><span>Time</span><b id="hud-time">0:00.0</b></div>
+        <div class="hud-item"><span>Speed</span><b><i id="hud-wpm">0</i> wpm</b></div>
+        <div class="hud-item"><span>Accuracy</span><b><i id="hud-acc">100</i>%</b></div>
+      </div>
+      <div class="track" id="track"></div>
+      <div class="copy" id="copy" aria-label="Text to type"></div>
+      <input class="type-input" id="type-input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Type the highlighted word" aria-label="Type here" disabled>
+      <p class="finish-note" id="finish-note" hidden></p>
+    </section>
+
+    <!-- 5. Round result -->
+    <section class="screen stage wide" id="s-result" hidden>
+      <p class="eyebrow" id="res-eyebrow"></p>
+      <h1 class="hero" id="res-place"></h1>
+      <div class="stats" id="res-stats"></div>
+      <div class="lb" id="res-lb"></div>
+      <p class="lede" id="res-wait"></p>
+    </section>
+
+    <!-- 6. Final -->
+    <section class="screen stage wide" id="s-final" hidden>
+      <p class="eyebrow">Final standings</p>
+      <h1 class="hero" id="fin-title">Eyes on the big screen</h1>
+      <p class="lede" id="fin-sub">The podium is being revealed.</p>
+      <div class="lb" id="fin-lb" hidden></div>
+    </section>
+  </main>
+
+  <div class="countdown" id="countdown" hidden><div class="cd-num"></div></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="module" src="/js/player.js"></script>
+</body>
+</html>

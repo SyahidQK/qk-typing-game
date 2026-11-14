@@ -1,0 +1,20 @@
+{
+  "name": "qk-typing-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Real-time typing race with PIN lobby, 10 players, 3 rounds",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test",
+    "bots": "node scripts/bots.js"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "socket.io-client": "^4.8.1"
+  }
+}
