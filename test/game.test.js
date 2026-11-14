@@ -110,6 +110,45 @@ test('allDone ignores disconnected players; zero progress scores zero', () => {
   assert.equal(g.players.get(ps[1].id).roundPoints, 0);
 });
 
+test('replaying a round removes its points and races the same text again', () => {
+  const { g, ps, clock } = setup(2);
+  const finish = (order) => {
+    clock.add(4000 + 5000);
+    for (const i of order) { clock.add(1000); g.updateProgress(ps[i].id, g.text.length, g.text.length, 0); }
+    g.endRound();
+  };
+  assert.ok(g.redoRound().error);
+  g.startRound({ force: true });
+  finish([0, 1]);
+  const p0 = g.players.get(ps[0].id), p1 = g.players.get(ps[1].id);
+  assert.deepEqual([p0.total, p1.total], [1100, 1000]);
+
+  // replay round 1: totals back to zero, same text, fresh progress
+  const text1 = g.text;
+  assert.ok(g.redoRound().ok);
+  assert.equal(g.phase, 'racing');
+  assert.equal(g.round, 1);
+  assert.equal(g.text, text1);
+  assert.deepEqual([p0.total, p1.total, p0.totalTimeMs], [0, 0, 0]);
+  assert.deepEqual([p0.progress, p0.finished], [0, false]);
+  finish([1, 0]);
+  assert.deepEqual([p0.total, p1.total], [1000, 1100]);
+  assert.equal(p1.rank, 1);
+
+  // replay the last round from the final screen
+  g.startRound({ force: true }); finish([0, 1]);
+  g.startRound({ force: true }); finish([0, 1]);
+  assert.equal(g.phase, 'final');
+  const before = [p0.undo.total, p1.undo.total];
+  assert.ok(g.redoRound().ok);
+  assert.equal(g.round, 3);
+  assert.deepEqual([p0.total, p1.total], before);
+  finish([1, 0]);
+  assert.equal(g.phase, 'final');
+  // round 1 replay (1st), round 2 (2nd), round 3 replay (1st): the discarded runs never count
+  assert.equal(p1.total, 1100 + 1000 + 1100);
+});
+
 test('texts can only be edited in the lobby', () => {
   const { g } = setup(1);
   assert.ok(g.setTexts(['short']).error);

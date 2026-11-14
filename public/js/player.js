@@ -151,7 +151,7 @@ function sendProgress() {
 setInterval(() => { if (pendingSend) sendProgress(); }, SEND_MS);
 
 function startRace(me) {
-  raceRound = state.round;
+  raceRound = state.startAt;
   if (typing) typing.destroy();
   track.reset();
   typeInput.disabled = true;
@@ -180,7 +180,7 @@ function startRace(me) {
 
 function renderRace(me) {
   showScreen('s-race');
-  if (raceRound !== state.round) startRace(me);
+  if (raceRound !== state.startAt) startRace(me);
   $('#hud-round').textContent = state.round + ' of ' + state.rounds;
   track.update(state, meId);
   const note = $('#finish-note');
@@ -214,9 +214,9 @@ function stat(label, value) {
 }
 
 function renderResult(me) {
-  const fresh = showScreen('s-result') || resultRound !== state.round;
+  const fresh = showScreen('s-result') || resultRound !== state.startAt;
   if (!fresh) return;
-  resultRound = state.round;
+  resultRound = state.startAt;
   countdown.stop();
   $('#res-eyebrow').textContent = 'Round ' + state.round + ' of ' + state.rounds;
   $('#res-place').textContent = me.finished ? ordinal(me.place) + ' place' : 'Out of time';

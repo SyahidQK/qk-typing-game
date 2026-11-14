@@ -30,8 +30,8 @@ for (let i = 0; i < count; i++) {
   });
 
   socket.on('state', (s) => {
-    if (s.phase !== 'racing' || s.round === round) return;
-    round = s.round;
+    if (s.phase !== 'racing' || s.startAt === round) return;
+    round = s.startAt;
     clearInterval(timer);
     const len = s.text.length;
     const startLocal = Date.now() + (s.startAt - s.serverNow);

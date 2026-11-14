@@ -73,6 +73,17 @@ $('#new-btn').addEventListener('click', () => {
   if (confirm('Open a new game? The current results will be cleared.')) createGame();
 });
 
+// Replay the round that just ended: its points are discarded and everyone
+// races the same text again after a fresh countdown.
+function redo() {
+  if (!state) return;
+  const ok = confirm('Replay round ' + state.round + '?\n\nThe points from this round are removed and everyone races the same text again after a new countdown.');
+  if (!ok) return;
+  socket.emit('admin:redo', (r) => { if (r && r.error) alert(r.error); });
+}
+$('#redo-btn').addEventListener('click', redo);
+$('#redo-final-btn').addEventListener('click', redo);
+
 // ---------- lobby ----------
 function paintTexts() {
   $('#texts-fields').innerHTML = texts.map((t, i) =>
@@ -138,8 +149,8 @@ $('#end-btn').addEventListener('click', () => {
 
 function renderRace() {
   showScreen('s-race');
-  if (raceRound !== state.round) {
-    raceRound = state.round;
+  if (raceRound !== state.startAt) {
+    raceRound = state.startAt;
     track.reset();
     countdown.start(state.startAt, null);
   }
@@ -155,9 +166,9 @@ setInterval(() => {
 $('#next-btn').addEventListener('click', () => socket.emit('admin:next'));
 
 function renderResults() {
-  const fresh = showScreen('s-results') || resultRound !== state.round;
+  const fresh = showScreen('s-results') || resultRound !== state.startAt;
   if (!fresh) return;
-  resultRound = state.round;
+  resultRound = state.startAt;
   countdown.stop();
   $('#res-eyebrow').textContent = 'Round ' + state.round + ' of ' + state.rounds;
   const winner = state.players.find((p) => p.place === 1 && p.finished);
@@ -166,6 +177,7 @@ function renderResults() {
     : 'Nobody crossed the line';
   renderLeaderboard($('#res-lb'), state.players, {});
   $('#next-btn').textContent = 'Start round ' + (state.round + 1);
+  $('#redo-btn').textContent = 'Replay round ' + state.round;
   setTimeout(() => sfx.rankUp(), 1000);
 }
 
@@ -189,7 +201,8 @@ function renderFinal() {
   const top = [...state.players].sort((a, b) => a.rank - b.rank).slice(0, 3);
   $('#fin-title').textContent = 'And the winners are…';
   $('#fin-lb').hidden = true;
-  $('#new-btn').hidden = true;
+  $('#final-actions').hidden = true;
+  $('#redo-final-btn').textContent = 'Replay round ' + state.round;
   // visual order on the podium: 2nd, 1st, 3rd
   $('#podium').innerHTML = [1, 0, 2].filter((i) => top[i]).map((i) => {
     const p = top[i];
@@ -212,7 +225,7 @@ function renderFinal() {
   revealTimers.push(setTimeout(() => {
     $('#fin-lb').hidden = false;
     renderLeaderboard($('#fin-lb'), state.players, { animate: false, showGain: false });
-    $('#new-btn').hidden = false;
+    $('#final-actions').hidden = false;
   }, 8500));
 }
 
@@ -221,7 +234,14 @@ function render() {
   if (state.phase === 'lobby') {
     if (raceRound || finalShown) resetLocal();
     renderLobby();
-  } else if (state.phase === 'racing') renderRace();
+  } else if (state.phase === 'racing') {
+    if (finalShown) { // the last round is being replayed: clear the podium
+      finalShown = false;
+      revealTimers.forEach(clearTimeout); revealTimers = [];
+      $('#confetti').innerHTML = '';
+    }
+    renderRace();
+  }
   else if (state.phase === 'results') renderResults();
   else if (state.phase === 'final') renderFinal();
 }

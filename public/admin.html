@@ -81,7 +81,10 @@
       <p class="eyebrow" id="res-eyebrow"></p>
       <h1 class="hero hero-sm" id="res-title"></h1>
       <div class="lb" id="res-lb"></div>
-      <button class="key key-sun key-lg" type="button" id="next-btn" data-autofocus></button>
+      <div class="actions">
+        <button class="key key-sun key-lg" type="button" id="next-btn" data-autofocus></button>
+        <button class="link" type="button" id="redo-btn"></button>
+      </div>
     </section>
 
     <!-- Final -->
@@ -90,7 +93,10 @@
       <h1 class="hero hero-sm" id="fin-title">And the winners are…</h1>
       <div class="podium" id="podium"></div>
       <div class="lb" id="fin-lb" hidden></div>
-      <button class="key" type="button" id="new-btn" hidden>Open a new game</button>
+      <div class="actions" id="final-actions" hidden>
+        <button class="key" type="button" id="new-btn">Open a new game</button>
+        <button class="link" type="button" id="redo-final-btn"></button>
+      </div>
     </section>
   </main>
 

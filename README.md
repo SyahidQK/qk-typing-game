@@ -30,6 +30,8 @@ Run the game-logic tests with `npm test`.
 6. The round ends when every connected racer finishes, at the 5-minute cap, or when the host presses **End round now**.
 7. The leaderboard shows between rounds; after round 3 the host screen reveals the podium.
 
+If a round went wrong (someone was not ready, a laptop froze), press **Replay round N** on the leaderboard, or on the final screen for the last round. That round's points are removed and everyone races the same text again after a new countdown.
+
 ## Scoring
 
 | | |

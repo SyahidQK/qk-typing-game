@@ -122,6 +122,8 @@ class Game {
     this.capAt = this.startAt + this.roundCapMs;
     this.finishCount = 0;
     for (const p of this.players.values()) {
+      // snapshot so the host can replay this round without its points counting
+      p.undo = { total: p.total, totalTimeMs: p.totalTimeMs, rank: p.rank, prevRank: p.prevRank };
       p.progress = 0; p.keystrokes = 0; p.errors = 0;
       p.finished = false; p.timeMs = 0; p.wpm = 0; p.accuracy = 1; p.place = 0; p.roundPoints = 0;
     }
@@ -190,6 +192,22 @@ class Game {
     this._rerank(true);
     this.phase = this.round >= this.rounds ? 'final' : 'results';
     return { ok: true };
+  }
+
+  // Throw away the round that just ended and race the same text again.
+  redoRound() {
+    if (this.phase !== 'results' && this.phase !== 'final') return { error: 'There is no finished round to replay.' };
+    if (this.players.size === 0) return { error: 'No players are left in the game.' };
+    for (const p of this.players.values()) {
+      if (!p.undo) continue;
+      p.total = p.undo.total;
+      p.totalTimeMs = p.undo.totalTimeMs;
+      p.rank = p.undo.rank;
+      p.prevRank = p.undo.prevRank;
+    }
+    this.round--;
+    this.phase = this.round === 0 ? 'lobby' : 'results';
+    return this.startRound({ force: true });
   }
 
   _rerank(keepPrev) {

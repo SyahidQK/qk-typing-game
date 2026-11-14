@@ -49,8 +49,8 @@ function scheduleEndIfDone() {
   if (game && game.allDone() && !endTimer) endTimer = setTimeout(endRoundNow, END_DELAY_MS);
 }
 
-function startRound(force) {
-  const r = game.startRound({ force });
+function startRound(force, redo = false) {
+  const r = redo ? game.redoRound() : game.startRound({ force });
   if (r.ok) {
     clearTimers();
     capTimer = setTimeout(endRoundNow, game.capAt - Date.now() + 50);
@@ -172,6 +172,11 @@ io.on('connection', (socket) => {
   socket.on('admin:next', admin((msg, ack) => {
     if (!game || game.phase !== 'results') return ack({ error: 'The next round is not available yet.' });
     ack(startRound(true));
+  }));
+
+  socket.on('admin:redo', admin((msg, ack) => {
+    if (!game) return ack({ error: 'Create a game first.' });
+    ack(startRound(true, true));
   }));
 
   socket.on('admin:endRound', admin((msg, ack) => {
