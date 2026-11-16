@@ -3,23 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Keysprint</title>
+  <title>The Great Keyboard Showdown</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Permanent+Marker&family=Figtree:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/css/style.css">
 </head>
 <body class="player">
   <header class="topbar">
-    <span class="brand">Key<b>sprint</b></span>
+    <span class="brand">Ecopia<b>Wellness</b><i>2026</i></span>
     <span class="conn" id="conn" hidden>Reconnecting…</span>
     <button type="button" class="ghost" id="mute"></button>
   </header>
 
   <main>
     <!-- 1. PIN -->
-    <section class="screen stage" id="s-pin" hidden>
-      <h1 class="hero">Ten racers.<br>One paragraph.</h1>
+    <section class="screen stage" id="s-pin" data-rain hidden>
+      <div class="showdown">
+        <h1 class="showdown-title">
+          <span class="sd-1">The Great
+            <svg class="showdown-crown" viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 30 L4 12 L14 21 L20 7 L26 21 L36 12 L35 30 Z"/><path d="M8 36 H32"/></svg>
+          </span>
+          <span class="sd-2 brush">Keyboard</span>
+          <span class="sd-3">Showdown!</span>
+        </h1>
+        <p class="tagline">Your skills. Your chance.</p>
+      </div>
       <form class="card form" id="pin-form" novalidate>
         <label for="pin">Game PIN</label>
         <div class="pin-field">
@@ -34,7 +43,7 @@
     </section>
 
     <!-- 2. Nickname -->
-    <section class="screen stage" id="s-name" hidden>
+    <section class="screen stage" id="s-name" data-rain hidden>
       <h1 class="hero">Who is racing?</h1>
       <form class="card form" id="name-form" novalidate>
         <label for="name">Nickname</label>
@@ -94,5 +103,6 @@
 
   <script src="/socket.io/socket.io.js"></script>
   <script type="module" src="/js/player.js"></script>
+  <script type="module" src="/js/rain.js"></script>
 </body>
 </html>

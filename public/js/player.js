@@ -212,7 +212,7 @@ function startRace(me) {
       const caret = $('#copy .t-caret');
       if (!caret) return;
       const box = caret.getBoundingClientRect();
-      sparks(box.left, box.top + box.height / 2, [me.color, '#FFD23F', '#3DDC97'], wordDone ? 7 : 2);
+      sparks(box.left, box.top + box.height / 2, [me.color, '#FFC61A', '#FF6A00'], wordDone ? 7 : 2);
     },
     onFinish: () => {
       sendProgress();

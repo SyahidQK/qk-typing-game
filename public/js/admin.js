@@ -184,7 +184,7 @@ function renderResults() {
 // ---------- final ----------
 function confetti() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const colors = ['#FFD23F', '#FF5D5D', '#3DDC97', '#F5F2FF', '#7CC6FE'];
+  const colors = ['#FF6A00', '#FFC61A', '#FFF4E3', '#FF8F3D', '#FFE08A'];
   let html = '';
   for (let i = 0; i < 70; i++) {
     html += '<i style="left:' + (Math.random() * 100).toFixed(1) + '%;background:' + colors[i % colors.length] +
@@ -220,7 +220,7 @@ function renderFinal() {
   reveal(1, 6000, () => {
     sfx.win();
     confetti();
-    if (top[0]) $('#fin-title').textContent = top[0].name + ' wins the sprint';
+    if (top[0]) $('#fin-title').textContent = top[0].name + ' wins the showdown';
   });
   revealTimers.push(setTimeout(() => {
     $('#fin-lb').hidden = false;
