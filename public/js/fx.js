@@ -1,7 +1,27 @@
-// Small motion effects. All of them are skipped when the device asks for
-// reduced motion (add ?motion=1 to the address to force them on for testing).
-const forced = /[?&]motion=1/.test(location.search);
-export const motionOK = () => forced || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Small motion effects. They are on by default on every device, because the
+// movement is part of the game; the "Effects" button in the top bar turns
+// them all off for anyone who prefers a still screen. The choice is remembered.
+const EFFECTS_KEY = 'ks_effects';
+const rootEl = document.documentElement;
+try { if (localStorage.getItem(EFFECTS_KEY) === 'off') rootEl.classList.add('no-effects'); } catch (e) { /* storage blocked */ }
+
+export const motionOK = () => !rootEl.classList.contains('no-effects');
+
+function setEffects(on) {
+  rootEl.classList.toggle('no-effects', !on);
+  try { localStorage.setItem(EFFECTS_KEY, on ? 'on' : 'off'); } catch (e) { /* storage blocked */ }
+  window.dispatchEvent(new Event('effectschange'));
+}
+
+const effectsBtn = document.querySelector('#effects');
+if (effectsBtn) {
+  const paint = () => {
+    effectsBtn.textContent = motionOK() ? 'Effects on' : 'Effects off';
+    effectsBtn.setAttribute('aria-pressed', String(motionOK()));
+  };
+  effectsBtn.addEventListener('click', () => { setEffects(!motionOK()); paint(); });
+  paint();
+}
 
 let layer = null;
 function fxLayer() {

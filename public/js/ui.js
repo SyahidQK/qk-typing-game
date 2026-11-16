@@ -82,7 +82,7 @@ export function renderLeaderboard(el, players, { meId = null, animate = true, sh
   const sorted = [...players].sort((a, b) => a.rank - b.rank);
   el.innerHTML = '';
   el.style.height = sorted.length * ROW_H + 'px';
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const reduce = document.documentElement.classList.contains('no-effects');
   const move = animate && !reduce;
   const rows = sorted.map((p) => {
     const row = document.createElement('div');

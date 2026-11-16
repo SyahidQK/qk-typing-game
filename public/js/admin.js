@@ -183,7 +183,7 @@ function renderResults() {
 
 // ---------- final ----------
 function confetti() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  if (document.documentElement.classList.contains('no-effects')) return;
   const colors = ['#FF6A00', '#FFC61A', '#FFF4E3', '#FF8F3D', '#FFE08A'];
   let html = '';
   for (let i = 0; i < 70; i++) {

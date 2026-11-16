@@ -123,6 +123,7 @@ window.addEventListener('resize', resize);
 window.addEventListener('pointermove', (e) => { pointerX = e.clientX; }, { passive: true });
 window.addEventListener('pointerleave', () => { pointerX = -9999; });
 document.addEventListener('visibilitychange', () => { setActive(false); sync(); }); // pause in a background tab
+window.addEventListener('effectschange', () => { setActive(false); sync(); }); // Effects button toggled
 new MutationObserver(sync).observe(document.querySelector('main'), { subtree: true, attributes: true, attributeFilter: ['hidden'] });
 
 resize();

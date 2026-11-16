@@ -321,8 +321,8 @@ main { flex: 1; display: flex; flex-direction: column; padding: 0 clamp(16px, 3v
   .pod-block { font-size: 2.2rem; }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+@media all { /* Effects button turned off */
+  html.no-effects *, html.no-effects *::before, html.no-effects *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
 
 /* primary action with a quieter secondary beside it */
@@ -373,8 +373,8 @@ main { flex: 1; display: flex; flex-direction: column; padding: 0 clamp(16px, 3v
 .fx-layer { position: fixed; inset: 0; z-index: 15; pointer-events: none; overflow: hidden; }
 .fx-layer i { position: absolute; border-radius: 50%; margin: -3px 0 0 -3px; }
 
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation-iteration-count: 1 !important; }
+@media all { /* Effects button turned off */
+  html.no-effects *, html.no-effects *::before, html.no-effects *::after { animation-iteration-count: 1 !important; }
 }
 
 /* ==========================================================
@@ -445,3 +445,10 @@ main { flex: 1; display: flex; flex-direction: column; padding: 0 clamp(16px, 3v
 .rain { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; opacity: 0; transition: opacity .7s ease; }
 .rain.is-on { opacity: 1; }
 .topbar, main { position: relative; z-index: 1; }
+
+/* two top-bar toggles sit together on the right */
+.ghost + .ghost { margin-left: 0; }
+@media (max-width: 640px) {
+  .topbar { gap: 8px; }
+  .ghost { padding: 5px 10px; font-size: .75rem; }
+}
