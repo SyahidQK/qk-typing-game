@@ -452,3 +452,10 @@ main { flex: 1; display: flex; flex-direction: column; padding: 0 clamp(16px, 3v
   .topbar { gap: 8px; }
   .ghost { padding: 5px 10px; font-size: .75rem; }
 }
+
+/* small credit pinned to the bottom-right corner of every screen */
+.credit {
+  position: fixed; right: 12px; bottom: 8px; z-index: 2; margin: 0; pointer-events: none;
+  font: 600 .72rem var(--body); letter-spacing: .04em; color: rgba(255, 244, 227, .6);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
+}
