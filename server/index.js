@@ -72,8 +72,8 @@ function attach(socket, player) {
   player.connected = true;
 }
 
-function detachAllPlayers() {
-  for (const s of sockets.values()) { s.data.playerId = null; s.leave(ROOM); s.emit('closed'); }
+function detachAllPlayers(event = 'closed', payload) {
+  for (const s of sockets.values()) { s.data.playerId = null; s.leave(ROOM); s.emit(event, payload); }
   sockets.clear();
 }
 
@@ -144,6 +144,17 @@ io.on('connection', (socket) => {
     clearTimers();
     detachAllPlayers();
     game = new Game({ texts: currentTexts });
+    ack({ ok: true, texts: game.texts });
+    broadcast();
+  }));
+
+  // Start over from the PIN screen: every racer and score is cleared, but the
+  // PIN stays the same so the code on the big screen keeps working.
+  socket.on('admin:reset', admin((msg, ack) => {
+    if (!game) return ack({ error: 'Create a game first.' });
+    clearTimers();
+    detachAllPlayers('reset', { pin: game.pin });
+    game = new Game({ texts: currentTexts, pin: game.pin });
     ack({ ok: true, texts: game.texts });
     broadcast();
   }));

@@ -69,6 +69,20 @@ function resetLocal() {
   track.reset();
 }
 $('#create-btn').addEventListener('click', createGame);
+
+// Reset: everyone is sent back to the PIN screen and all scores are cleared.
+// The PIN stays the same, so players just key it in again.
+$('#reset-btn').addEventListener('click', () => {
+  const ok = confirm('Reset the game?\n\nAll racers are removed and every score is cleared. ' +
+    'Everyone goes back to the PIN screen and joins again with the same PIN.');
+  if (!ok) return;
+  countdown.stop();
+  socket.emit('admin:reset', (r) => {
+    if (r && r.error) { alert(r.error); return; }
+    if (r && r.texts) { texts = r.texts; paintTexts(); }
+    resetLocal();
+  });
+});
 $('#new-btn').addEventListener('click', () => {
   if (confirm('Open a new game? The current results will be cleared.')) createGame();
 });
@@ -231,6 +245,7 @@ function renderFinal() {
 
 function render() {
   if (!state) return;
+  $('#reset-btn').hidden = false;
   if (state.phase === 'lobby') {
     if (raceRound || finalShown) resetLocal();
     renderLobby();

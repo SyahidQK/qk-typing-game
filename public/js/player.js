@@ -38,13 +38,13 @@ function saveToken(t) {
   try { t ? localStorage.setItem(TOKEN_KEY, t) : localStorage.removeItem(TOKEN_KEY); } catch (e) { /* storage blocked */ }
 }
 
-function leave(message) {
+function leave(message, keepPin = '') {
   saveToken(null);
   meId = null; state = null; raceRound = 0; resultRound = 0; finalAt = 0;
   countdown.stop();
   if (typing) { typing.destroy(); typing = null; }
   track.reset();
-  pinInput.value = '';
+  pinInput.value = keepPin;
   paintPin();
   $('#pin-err').textContent = message || '';
   showScreen('s-pin');
@@ -62,6 +62,8 @@ socket.on('connect', () => {
 socket.on('disconnect', () => { $('#conn').hidden = false; });
 socket.on('kicked', () => leave('The host removed you from the game.'));
 socket.on('closed', () => leave('That game has ended. Enter a new PIN to join.'));
+// The host reset the game: same PIN, so it is filled in and the player just presses Enter game.
+socket.on('reset', (m) => leave('The host reset the game. Press Enter game to join again.', (m && m.pin) || ''));
 socket.on('replaced', () => {
   meId = null; state = null;
   $('#pin-err').textContent = 'This game is now open in another tab on this device.';

@@ -459,3 +459,8 @@ main { flex: 1; display: flex; flex-direction: column; padding: 0 clamp(16px, 3v
   font: 600 .72rem var(--body); letter-spacing: .04em; color: rgba(255, 244, 227, .6);
   text-shadow: 0 1px 2px rgba(0, 0, 0, .8);
 }
+
+/* host reset sits apart from the effect toggles and reads as a warning */
+.ghost-warn { margin-left: auto; color: #FFB3A0; border-color: rgba(255, 106, 0, .5); }
+.ghost-warn:hover { color: #fff; border-color: var(--go); background: rgba(255, 106, 0, .18); }
+.ghost-warn + .ghost { margin-left: 0; }
